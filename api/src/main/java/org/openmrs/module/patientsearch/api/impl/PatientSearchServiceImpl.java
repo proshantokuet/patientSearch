@@ -16,14 +16,17 @@ package org.openmrs.module.patientsearch.api.impl;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.module.patientsearch.PatentSearch;
 import org.openmrs.module.patientsearch.api.PatientSearchService;
 import org.openmrs.module.patientsearch.api.db.PatientSearchDAO;
+import java.util.List;
 
 /**
  * It is a default implementation of {@link PatientSearchService}.
  */
 public class PatientSearchServiceImpl extends BaseOpenmrsService implements PatientSearchService {
 	
+
 	protected final Log log = LogFactory.getLog(this.getClass());
 	
 	private PatientSearchDAO dao;
@@ -41,4 +44,11 @@ public class PatientSearchServiceImpl extends BaseOpenmrsService implements Pati
     public PatientSearchDAO getDao() {
 	    return dao;
     }
+    
+	@Override
+	public List<PatentSearch> getPateintInformationByQuery(String firstName,
+			String mobileNo, String district, int limit) {
+		return dao.getPateintInformationByQuery(firstName, mobileNo, district, limit);
+	}
+
 }

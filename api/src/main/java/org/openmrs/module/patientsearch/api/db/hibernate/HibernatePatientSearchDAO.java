@@ -15,8 +15,15 @@ package org.openmrs.module.patientsearch.api.db.hibernate;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.SQLQuery;
 import org.hibernate.SessionFactory;
+import org.hibernate.transform.AliasToBeanResultTransformer;
+import org.hibernate.type.StandardBasicTypes;
+import org.openmrs.module.patientsearch.PatentSearch;
 import org.openmrs.module.patientsearch.api.db.PatientSearchDAO;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * It is a default implementation of  {@link PatientSearchDAO}.
@@ -39,4 +46,83 @@ public class HibernatePatientSearchDAO implements PatientSearchDAO {
     public SessionFactory getSessionFactory() {
 	    return sessionFactory;
     }
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<PatentSearch> getPateintInformationByQuery(String firstName, String mobileNo, String district, int limit) {
+		List<PatentSearch> patientList = new ArrayList<PatentSearch>();
+		
+		String filterString = "";
+		if (!firstName.isEmpty() && mobileNo.isEmpty() && district.isEmpty()) {
+			filterString = "WHERE  pname.given_name LIKE '"+ firstName +"%'";
+		}
+		else if (firstName.isEmpty() && !mobileNo.isEmpty() && district.isEmpty()) {
+			filterString = "WHERE  temp1.phoneno LIKE '"+ mobileNo +"%'";
+		}
+		else if (firstName.isEmpty() && mobileNo.isEmpty() && !district.isEmpty()) {
+			filterString = "WHERE  paddress.address2 = '"+ district +"'";
+		}
+		
+		if (!firstName.isEmpty() && !mobileNo.isEmpty()) {
+			
+			filterString = "";
+			filterString = "WHERE  pname.given_name LIKE '"+ firstName +"%'" +" AND temp1.phoneno LIKE '"+ mobileNo +"%'";
+		}
+		else if (!firstName.isEmpty() && !district.isEmpty()) {
+			
+			filterString = "";
+			filterString = "WHERE  pname.given_name LIKE '"+ firstName +"%'" +" AND paddress.address2 = '"+ district +"'";
+		}
+		else if (!mobileNo.isEmpty() && !district.isEmpty()) {
+			
+			filterString = "";
+			filterString = "WHERE  temp1.phoneno LIKE '"+ mobileNo +"%'" +" AND paddress.address2 = '"+ district +"'";
+		}
+		 if (!firstName.isEmpty() && !mobileNo.isEmpty() && !district.isEmpty()) {
+			filterString = "";
+			filterString = "WHERE  pname.given_name LIKE '"+ firstName +"%' \n" +
+	                "        AND temp1.phoneno LIKE '"+ mobileNo +"%' \n" +
+	                "        AND paddress.address2 = '"+ district +"'";
+		}
+		 
+		String patientSql =  "SELECT pi.identifier         AS healthId, \n" +
+                "       pname.given_name      AS firstName, \n" +
+                "       pname.family_name      AS lastName, \n" +
+                "       temp1.phoneno         AS phoneNo, \n" +
+                "       temp3.fatherName AS fatherName, \n" +
+                "       p.gender              AS gender, \n" +
+                "       pname.date_created  AS registeredDate,\n" +
+                "       paddress.address2 as district,\n" +
+                "       IFNULL(TIMESTAMPDIFF(YEAR, p.birthdate, CURDATE()),0) AS age,\n" +
+                "       p.uuid           AS patientUuid \n" +
+                "       \n" +
+                "FROM   person_name pname \n" +
+                "       JOIN patient_identifier pi \n" +
+                "              ON pname.person_id = pi.patient_id \n" +
+                "        JOIN person p \n" +
+                "              ON p.person_id = pi.patient_id\n" +
+                "\t    JOIN person_address paddress\n" +
+                "              ON paddress.person_id = pi.patient_id\n" +
+                "        JOIN (SELECT pat.person_attribute_type_id, \n" +
+                "                         pat.value AS phoneNo, \n" +
+                "                         pat.person_id \n" +
+                "                  FROM   person_attribute pat \n" +
+                "                  WHERE  pat.person_attribute_type_id = 26) AS temp1 \n" +
+                "              ON pi.patient_id = temp1.person_id \n" +
+                "        JOIN (SELECT pa.person_attribute_type_id, \n" +
+                "                         pa.value AS fatherName, \n" +
+                "                         pa.person_id \n" +
+                "                  FROM   person_attribute pa \n" +
+                "                  WHERE  pa.person_attribute_type_id = 28) AS temp3 \n" +
+                "              ON pi.patient_id = temp3.person_id \n" +
+                 filterString + " and p.gender <> 'H' and pname.preferred = 1 and paddress.preferred = 1 LIMIT "+limit+",30;";
+		
+		patientList = sessionFactory.getCurrentSession().createSQLQuery(patientSql).addScalar("healthId", StandardBasicTypes.STRING)
+				.addScalar("firstName", StandardBasicTypes.STRING).addScalar("lastName", StandardBasicTypes.STRING)
+				.addScalar("phoneNo", StandardBasicTypes.STRING).addScalar("fatherName", StandardBasicTypes.STRING).addScalar("gender", StandardBasicTypes.STRING)
+				.addScalar("registeredDate", StandardBasicTypes.DATE).addScalar("district", StandardBasicTypes.STRING)
+				.addScalar("age", StandardBasicTypes.INTEGER).addScalar("patientUuid", StandardBasicTypes.STRING)
+				.setResultTransformer(new AliasToBeanResultTransformer(PatentSearch.class)).list();
+		return patientList;
+	}
 }

@@ -13,14 +13,14 @@
  */
 package org.openmrs.module.patientsearch.api.db;
 
+import org.openmrs.module.patientsearch.PatentSearch;
 import org.openmrs.module.patientsearch.api.PatientSearchService;
+import java.util.List;
 
 /**
  *  Database methods for {@link PatientSearchService}.
  */
 public interface PatientSearchDAO {
 	
-	/*
-	 * Add DAO methods here
-	 */
+	public List<PatentSearch> getPateintInformationByQuery(String firstName, String mobileNo, String district, int limit);
 }

@@ -14,6 +14,8 @@
 package org.openmrs.module.patientsearch;
 
 import java.io.Serializable;
+import java.util.Date;
+
 import org.openmrs.BaseOpenmrsObject;
 import org.openmrs.BaseOpenmrsMetadata;
 
@@ -24,8 +26,149 @@ public class PatentSearch extends BaseOpenmrsObject implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
-	private Integer id;
+	private int id;
 	
+	private String healthId;
+	
+	private String nationalId;
+	
+	private String firstName;
+	
+	private String phoneNo;
+	
+	private String motherName;
+	
+	private String gender;
+	
+	private String birthDate;
+	
+	private Date registeredDate;
+	
+	private String district;
+	
+	private String middleName;
+	
+	private String lastName;
+	
+	private String fatherName;
+	
+	private int age;
+	
+	private String patientUuid;
+	
+	public String getHealthId() {
+		return healthId;
+	}
+
+	public void setHealthId(String healthId) {
+		this.healthId = healthId;
+	}
+
+	public String getNationalId() {
+		return nationalId;
+	}
+
+	public void setNationalId(String nationalId) {
+		this.nationalId = nationalId;
+	}
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getPhoneNo() {
+		return phoneNo;
+	}
+
+	public void setPhoneNo(String phoneNo) {
+		this.phoneNo = phoneNo;
+	}
+
+	public String getMotherName() {
+		return motherName;
+	}
+
+	public void setMotherName(String motherName) {
+		this.motherName = motherName;
+	}
+
+	public String getGender() {
+		return gender;
+	}
+
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+
+	public String getBirthDate() {
+		return birthDate;
+	}
+
+	public void setBirthDate(String birthDate) {
+		this.birthDate = birthDate;
+	}
+
+
+	public Date getRegisteredDate() {
+		return registeredDate;
+	}
+
+	public void setRegisteredDate(Date registeredDate) {
+		this.registeredDate = registeredDate;
+	}
+
+	public String getDistrict() {
+		return district;
+	}
+
+	public void setDistrict(String district) {
+		this.district = district;
+	}
+
+	public String getMiddleName() {
+		return middleName;
+	}
+
+	public void setMiddleName(String middleName) {
+		this.middleName = middleName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+
+	public String getFatherName() {
+		return fatherName;
+	}
+
+	public void setFatherName(String fatherName) {
+		this.fatherName = fatherName;
+	}
+
+	public int getAge() {
+		return age;
+	}
+
+	public void setAge(int age) {
+		this.age = age;
+	}
+
+	public String getPatientUuid() {
+		return patientUuid;
+	}
+
+	public void setPatientUuid(String patientUuid) {
+		this.patientUuid = patientUuid;
+	}
+
 	@Override
 	public Integer getId() {
 		return id;
