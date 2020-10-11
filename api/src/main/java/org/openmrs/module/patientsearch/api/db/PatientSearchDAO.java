@@ -26,4 +26,5 @@ public interface PatientSearchDAO {
 	
 	public List<PatentSearch> getPateintInformationByQuery(String firstName, String mobileNo, String district, int limit);
 	public List<UserInfo> getUserInfor(String userName);
+	public List<PatentSearch> patientSync(String union,int patientId);
 }

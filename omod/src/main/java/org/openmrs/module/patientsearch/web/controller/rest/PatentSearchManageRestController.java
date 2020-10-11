@@ -57,4 +57,20 @@ public class PatentSearchManageRestController extends MainResourceController {
 	
 		return new ResponseEntity<String>(gson.toJson(userInfos), HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "/sync", method = RequestMethod.GET)
+	public ResponseEntity<String> patientSync(@RequestParam String union,@RequestParam int patientId
+														) throws Exception {
+		List<PatentSearch> patientSyncList = new ArrayList<PatentSearch>();
+		
+		try {
+			patientSyncList = Context.getService(PatientSearchService.class).patientSync(union, patientId);
+			
+		}
+		catch (Exception e) {
+			return new ResponseEntity<String>(gson.toJson(e.getMessage()), HttpStatus.OK);
+		}
+	
+		return new ResponseEntity<String>(gson.toJson(patientSyncList), HttpStatus.OK);
+	}
 }

@@ -14,12 +14,9 @@
 package org.openmrs.module.patientsearch;
 
 import java.io.Serializable;
-import java.util.Date;
 
-import javax.persistence.criteria.CriteriaBuilder.In;
-
-import org.openmrs.BaseOpenmrsObject;
 import org.openmrs.BaseOpenmrsMetadata;
+import org.openmrs.BaseOpenmrsObject;
 
 /**
  * It is a model class. It should extend either {@link BaseOpenmrsObject} or {@link BaseOpenmrsMetadata}.
@@ -31,7 +28,7 @@ public class UserInfo extends BaseOpenmrsObject implements Serializable {
 	private String userName;
 	private String wardName;
 	private Integer wardId;
-	private String uninName;
+	private String unionName;
 	private Integer unionId;
 	
 
@@ -67,12 +64,14 @@ public class UserInfo extends BaseOpenmrsObject implements Serializable {
 		this.wardId = wardId;
 	}
 
-	public String getUninName() {
-		return uninName;
+	
+
+	public String getUnionName() {
+		return unionName;
 	}
 
-	public void setUninName(String uninName) {
-		this.uninName = uninName;
+	public void setUnionName(String unionName) {
+		this.unionName = unionName;
 	}
 
 	public Integer getUnionId() {

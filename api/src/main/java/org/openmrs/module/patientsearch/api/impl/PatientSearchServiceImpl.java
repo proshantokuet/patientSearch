@@ -59,4 +59,10 @@ public class PatientSearchServiceImpl extends BaseOpenmrsService implements Pati
 		return dao.getUserInfor(userName);
 	}
 
+	@Override
+	public List<PatentSearch> patientSync(String union,int patientId) {
+		
+		return dao.patientSync(union,patientId);
+	}
+
 }

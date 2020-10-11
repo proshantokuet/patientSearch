@@ -13,6 +13,7 @@
  */
 package org.openmrs.module.patientsearch.api.db.hibernate;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.SQLQuery;
@@ -131,7 +132,7 @@ public class HibernatePatientSearchDAO implements PatientSearchDAO {
 	@Override
 	public List<UserInfo> getUserInfor(String userName) {
 		List<UserInfo> userInfos = new ArrayList<UserInfo>();
-		String sql="select u.user_id userId, u.username userName,tml.location_id wardId,l.name wardName,l1.name uninName,"
+		String sql="select u.user_id userId, u.username userName,tml.location_id wardId,l.name wardName,l1.name unionName,"
 				+ " l1.location_id unionId from openmrs.users u join openmrs.team_member tm on "
 				+ " u.person_id = tm.person_id join openmrs.team_member_location tml"
 				+ "  on tm.team_id = tml.team_member_id join openmrs.location l "
@@ -139,9 +140,60 @@ public class HibernatePatientSearchDAO implements PatientSearchDAO {
 				+ " l.parent_location = l1.location_id where u.username=:username";
 		userInfos =sessionFactory.getCurrentSession().createSQLQuery(sql).addScalar("userId", StandardBasicTypes.INTEGER)
 		.addScalar("userName", StandardBasicTypes.STRING).addScalar("wardId", StandardBasicTypes.INTEGER)
-		.addScalar("wardName", StandardBasicTypes.STRING).addScalar("uninName", StandardBasicTypes.STRING).addScalar("unionId", StandardBasicTypes.INTEGER)
+		.addScalar("wardName", StandardBasicTypes.STRING).addScalar("unionName", StandardBasicTypes.STRING).addScalar("unionId", StandardBasicTypes.INTEGER)
 		.setString("username", userName)
 		.setResultTransformer(new AliasToBeanResultTransformer(UserInfo.class)).list();
 		return userInfos;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<PatentSearch> patientSync(String union,int patientId) {
+		List<PatentSearch> patientList = new ArrayList<PatentSearch>();
+		
+		String filterString = "";
+		if (!StringUtils.isBlank(union)) {
+			filterString = "WHERE  paddress.address1 = '"+ union +"' and pi.patient_id > "+patientId ;
+		}
+		
+		String patientSql =  "SELECT  pi.patient_id id,pi.identifier         AS healthId, \n" +
+                "       pname.given_name      AS firstName, \n" +
+                "       pname.family_name      AS lastName, \n" +
+                "       temp1.phoneno         AS phoneNo, \n" +
+                "       temp3.fatherName AS fatherName, \n" +
+                "       p.gender              AS gender, \n" +
+                "       pname.date_created  AS registeredDate,\n" +
+                "       paddress.address2 as district,\n" +
+                "       IFNULL(TIMESTAMPDIFF(YEAR, p.birthdate, CURDATE()),0) AS age,\n" +
+                "       p.uuid           AS patientUuid \n" +
+                "       \n" +
+                "FROM   person_name pname \n" +
+                "       JOIN patient_identifier pi \n" +
+                "              ON pname.person_id = pi.patient_id \n" +
+                "        JOIN person p \n" +
+                "              ON p.person_id = pi.patient_id\n" +
+                "\t    JOIN person_address paddress\n" +
+                "              ON paddress.person_id = pi.patient_id\n" +
+                "        JOIN (SELECT pat.person_attribute_type_id, \n" +
+                "                         pat.value AS phoneNo, \n" +
+                "                         pat.person_id \n" +
+                "                  FROM   person_attribute pat \n" +
+                "                  WHERE  pat.person_attribute_type_id = 26) AS temp1 \n" +
+                "              ON pi.patient_id = temp1.person_id \n" +
+                "        JOIN (SELECT pa.person_attribute_type_id, \n" +
+                "                         pa.value AS fatherName, \n" +
+                "                         pa.person_id \n" +
+                "                  FROM   person_attribute pa \n" +
+                "                  WHERE  pa.person_attribute_type_id = 28) AS temp3 \n" +
+                "              ON pi.patient_id = temp3.person_id \n" +
+                 filterString + " and p.gender <> 'H' and pname.preferred = 1 and paddress.preferred = 1 order by patient_id asc LIMIT 100";
+		
+		patientList = sessionFactory.getCurrentSession().createSQLQuery(patientSql).addScalar("id", StandardBasicTypes.INTEGER).addScalar("healthId", StandardBasicTypes.STRING)
+				.addScalar("firstName", StandardBasicTypes.STRING).addScalar("lastName", StandardBasicTypes.STRING)
+				.addScalar("phoneNo", StandardBasicTypes.STRING).addScalar("fatherName", StandardBasicTypes.STRING).addScalar("gender", StandardBasicTypes.STRING)
+				.addScalar("registeredDate", StandardBasicTypes.DATE).addScalar("district", StandardBasicTypes.STRING)
+				.addScalar("age", StandardBasicTypes.INTEGER).addScalar("patientUuid", StandardBasicTypes.STRING)
+				.setResultTransformer(new AliasToBeanResultTransformer(PatentSearch.class)).list();
+		return patientList;
 	}
 }
