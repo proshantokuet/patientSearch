@@ -17,8 +17,10 @@ import org.openmrs.api.impl.BaseOpenmrsService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.patientsearch.PatentSearch;
+import org.openmrs.module.patientsearch.UserInfo;
 import org.openmrs.module.patientsearch.api.PatientSearchService;
 import org.openmrs.module.patientsearch.api.db.PatientSearchDAO;
+
 import java.util.List;
 
 /**
@@ -49,6 +51,12 @@ public class PatientSearchServiceImpl extends BaseOpenmrsService implements Pati
 	public List<PatentSearch> getPateintInformationByQuery(String firstName,
 			String mobileNo, String district, int limit) {
 		return dao.getPateintInformationByQuery(firstName, mobileNo, district, limit);
+	}
+
+	@Override
+	public List<UserInfo> getUserInfor(String userName) {
+		// TODO Auto-generated method stub
+		return dao.getUserInfor(userName);
 	}
 
 }

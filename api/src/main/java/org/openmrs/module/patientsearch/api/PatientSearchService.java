@@ -15,7 +15,9 @@ package org.openmrs.module.patientsearch.api;
 
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.patientsearch.PatentSearch;
+import org.openmrs.module.patientsearch.UserInfo;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 /**
@@ -32,4 +34,5 @@ import java.util.List;
 public interface PatientSearchService extends OpenmrsService {
      
 	public List<PatentSearch> getPateintInformationByQuery(String firstName, String mobileNo, String district, int limit);
+	public List<UserInfo> getUserInfor(String userName);
 }

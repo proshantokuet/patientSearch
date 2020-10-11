@@ -14,7 +14,9 @@
 package org.openmrs.module.patientsearch.api.db;
 
 import org.openmrs.module.patientsearch.PatentSearch;
+import org.openmrs.module.patientsearch.UserInfo;
 import org.openmrs.module.patientsearch.api.PatientSearchService;
+
 import java.util.List;
 
 /**
@@ -23,4 +25,5 @@ import java.util.List;
 public interface PatientSearchDAO {
 	
 	public List<PatentSearch> getPateintInformationByQuery(String firstName, String mobileNo, String district, int limit);
+	public List<UserInfo> getUserInfor(String userName);
 }

@@ -12,13 +12,17 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.openmrs.module.patientsearch.PatentSearch;
+import org.openmrs.module.patientsearch.UserInfo;
 import org.openmrs.module.patientsearch.api.PatientSearchService;
 import org.openmrs.module.patientsearch.converter.PatientSearchDataConverter;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 @RequestMapping("/rest/v1/patient-search")
 @RestController
 public class PatentSearchManageRestController extends MainResourceController {
-	
+	public static Gson gson = new GsonBuilder().create();
 	@RequestMapping(value = "/get-all-patient-info", method = RequestMethod.GET)
 	public ResponseEntity<String> getAllChildByPatient(@RequestParam String firstName,
 														@RequestParam String mobileNo,
@@ -36,5 +40,21 @@ public class PatentSearchManageRestController extends MainResourceController {
 			return new ResponseEntity<String>(e.getMessage().toString(), HttpStatus.OK);
 		}
 		return new ResponseEntity<String>(patientJsonArray.toString(), HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/user-location", method = RequestMethod.GET)
+	public ResponseEntity<String> getUserLocation(@RequestParam String userName
+														) throws Exception {
+		List<UserInfo> userInfos = new ArrayList<UserInfo>();
+		
+		try {
+			userInfos = Context.getService(PatientSearchService.class).getUserInfor(userName);
+			
+		}
+		catch (Exception e) {
+			return new ResponseEntity<String>(gson.toJson(e.getMessage()), HttpStatus.OK);
+		}
+	
+		return new ResponseEntity<String>(gson.toJson(userInfos), HttpStatus.OK);
 	}
 }

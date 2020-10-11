@@ -20,6 +20,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.transform.AliasToBeanResultTransformer;
 import org.hibernate.type.StandardBasicTypes;
 import org.openmrs.module.patientsearch.PatentSearch;
+import org.openmrs.module.patientsearch.UserInfo;
 import org.openmrs.module.patientsearch.api.db.PatientSearchDAO;
 
 import java.util.ArrayList;
@@ -124,5 +125,23 @@ public class HibernatePatientSearchDAO implements PatientSearchDAO {
 				.addScalar("age", StandardBasicTypes.INTEGER).addScalar("patientUuid", StandardBasicTypes.STRING)
 				.setResultTransformer(new AliasToBeanResultTransformer(PatentSearch.class)).list();
 		return patientList;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<UserInfo> getUserInfor(String userName) {
+		List<UserInfo> userInfos = new ArrayList<UserInfo>();
+		String sql="select u.user_id userId, u.username userName,tml.location_id wardId,l.name wardName,l1.name uninName,"
+				+ " l1.location_id unionId from openmrs.users u join openmrs.team_member tm on "
+				+ " u.person_id = tm.person_id join openmrs.team_member_location tml"
+				+ "  on tm.team_id = tml.team_member_id join openmrs.location l "
+				+ " on tml.location_id = l.location_id left join openmrs.location l1 on "
+				+ " l.parent_location = l1.location_id where u.username=:username";
+		userInfos =sessionFactory.getCurrentSession().createSQLQuery(sql).addScalar("userId", StandardBasicTypes.INTEGER)
+		.addScalar("userName", StandardBasicTypes.STRING).addScalar("wardId", StandardBasicTypes.INTEGER)
+		.addScalar("wardName", StandardBasicTypes.STRING).addScalar("uninName", StandardBasicTypes.STRING).addScalar("unionId", StandardBasicTypes.INTEGER)
+		.setString("username", userName)
+		.setResultTransformer(new AliasToBeanResultTransformer(UserInfo.class)).list();
+		return userInfos;
 	}
 }
