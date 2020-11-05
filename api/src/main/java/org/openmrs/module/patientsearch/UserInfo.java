@@ -30,7 +30,7 @@ public class UserInfo extends BaseOpenmrsObject implements Serializable {
 	private Integer wardId;
 	private String unionName;
 	private Integer unionId;
-	
+	private String providerUUID;
 
 	public Integer getUserId() {
 		return userId;
@@ -92,6 +92,14 @@ public class UserInfo extends BaseOpenmrsObject implements Serializable {
 	public void setId(Integer id) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	public String getProviderUUID() {
+		return providerUUID;
+	}
+
+	public void setProviderUUID(String providerUUID) {
+		this.providerUUID = providerUUID;
 	}
 	
 	

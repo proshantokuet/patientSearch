@@ -55,7 +55,7 @@ public class PatentSearch extends BaseOpenmrsObject implements Serializable {
 	private int age;
 	
 	private String patientUuid;
-	
+	private String locationUUID;
 	public String getHealthId() {
 		return healthId;
 	}
@@ -177,6 +177,14 @@ public class PatentSearch extends BaseOpenmrsObject implements Serializable {
 	@Override
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	public String getLocationUUID() {
+		return locationUUID;
+	}
+
+	public void setLocationUUID(String locationUUID) {
+		this.locationUUID = locationUUID;
 	}
 	
 }

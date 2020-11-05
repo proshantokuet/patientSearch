@@ -133,14 +133,17 @@ public class HibernatePatientSearchDAO implements PatientSearchDAO {
 	public List<UserInfo> getUserInfor(String userName) {
 		List<UserInfo> userInfos = new ArrayList<UserInfo>();
 		String sql="select u.user_id userId, u.username userName,tml.location_id wardId,l.name wardName,l1.name unionName,"
-				+ " l1.location_id unionId from openmrs.users u join openmrs.team_member tm on "
+				+ " l1.location_id unionId,pr.uuid providerUUID from openmrs.users u join openmrs.team_member tm on "
 				+ " u.person_id = tm.person_id join openmrs.team_member_location tml"
 				+ "  on tm.team_id = tml.team_member_id join openmrs.location l "
-				+ " on tml.location_id = l.location_id left join openmrs.location l1 on "
-				+ " l.parent_location = l1.location_id where u.username=:username";
+				+ " on tml.location_id = l.location_id left join openmrs.location l1 on "				
+				+ " l.parent_location = l1.location_id "
+				+" join openmrs.provider pr on pr.person_id = u.person_id "
+				+ "where u.username=:username";
 		userInfos =sessionFactory.getCurrentSession().createSQLQuery(sql).addScalar("userId", StandardBasicTypes.INTEGER)
 		.addScalar("userName", StandardBasicTypes.STRING).addScalar("wardId", StandardBasicTypes.INTEGER)
 		.addScalar("wardName", StandardBasicTypes.STRING).addScalar("unionName", StandardBasicTypes.STRING).addScalar("unionId", StandardBasicTypes.INTEGER)
+		.addScalar("providerUUID", StandardBasicTypes.STRING)
 		.setString("username", userName)
 		.setResultTransformer(new AliasToBeanResultTransformer(UserInfo.class)).list();
 		return userInfos;
@@ -165,7 +168,8 @@ public class HibernatePatientSearchDAO implements PatientSearchDAO {
                 "       pname.date_created  AS registeredDate,\n" +
                 "       paddress.address2 as district,\n" +
                 "       IFNULL(TIMESTAMPDIFF(YEAR, p.birthdate, CURDATE()),0) AS age,\n" +
-                "       p.uuid           AS patientUuid \n" +
+                "       p.uuid           AS patientUuid, \n" +
+                "       l.uuid locationUUID \n"+
                 "       \n" +
                 "FROM   person_name pname \n" +
                 "       JOIN patient_identifier pi \n" +
@@ -174,6 +178,7 @@ public class HibernatePatientSearchDAO implements PatientSearchDAO {
                 "              ON p.person_id = pi.patient_id\n" +
                 "\t    JOIN person_address paddress\n" +
                 "              ON paddress.person_id = pi.patient_id\n" +
+                "       join openmrs.location l on l.name=paddress.address2 \n"+
                 "        JOIN (SELECT pat.person_attribute_type_id, \n" +
                 "                         pat.value AS phoneNo, \n" +
                 "                         pat.person_id \n" +
@@ -192,7 +197,7 @@ public class HibernatePatientSearchDAO implements PatientSearchDAO {
 				.addScalar("firstName", StandardBasicTypes.STRING).addScalar("lastName", StandardBasicTypes.STRING)
 				.addScalar("phoneNo", StandardBasicTypes.STRING).addScalar("fatherName", StandardBasicTypes.STRING).addScalar("gender", StandardBasicTypes.STRING)
 				.addScalar("registeredDate", StandardBasicTypes.DATE).addScalar("district", StandardBasicTypes.STRING)
-				.addScalar("age", StandardBasicTypes.INTEGER).addScalar("patientUuid", StandardBasicTypes.STRING)
+				.addScalar("age", StandardBasicTypes.INTEGER).addScalar("patientUuid", StandardBasicTypes.STRING).addScalar("locationUUID", StandardBasicTypes.STRING)
 				.setResultTransformer(new AliasToBeanResultTransformer(PatentSearch.class)).list();
 		return patientList;
 	}
